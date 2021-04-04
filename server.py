@@ -31,9 +31,12 @@ class ClientServer(asyncio.Protocol):
         resp = process_data(data.decode())
         self.transport.write(resp.encode())
 
+    @staticmethod
     def save(input):
         output = ''
+        # print(input)
         try:
+            # print(input)
             raw = input.split(' ')
             if raw[0] == request.get:
                 if raw[1] == request.all:
@@ -46,7 +49,7 @@ class ClientServer(asyncio.Protocol):
                         output += str(raw[1]) + ' ' + str(value[0]) + ' ' + str(value[1])
                     return 'ok\n' + output + '\n\n'
                 else:
-                    return 'ok\n' + output + '\n\n'
+                    return 'ok\n\n'
             elif raw[0] == request.put:
                 try:
                     if raw[1] not in data_recieved:
