@@ -1,5 +1,5 @@
 import asyncio
-from Collections import namedtuple
+from collections import namedtuple
 import bisect
 
 requests = namedtuple('requests', 'put get all') # all = '*\n'
@@ -54,7 +54,7 @@ class ClientServer(asyncio.Protocol):
                     bisect.insort(data[raw[1]], (raw[2], raw[3]))
                     return 'ok\n\n'
                 except Exception:
-                    return 'error\nwrong command\n\n' 
+                    return 'error\nwrong command\n\n'
             else:
                 return 'error\nwrong command\n\n'
         except Exception:
@@ -71,8 +71,9 @@ class ClientServer(asyncio.Protocol):
 # except KeyboardInterrupt:
 #     pass
 
-server.close()
-loop.run_until_complete(server.wait_closed())
-loop.close()
+# server.close()
+# loop.run_until_complete(server.wait_closed())
+# loop.close()
 
+run_server('127.0.0.1', 8888)
 ''' som '''
