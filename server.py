@@ -21,6 +21,8 @@ def run_server(host, port):
     return
 
 class ClientServer(asyncio.Protocol):
+    data_recieved = {}
+
     def connection_made(self, transport):
         self.transport = transport
 
@@ -28,7 +30,11 @@ class ClientServer(asyncio.Protocol):
         resp = process_data(data.decode())
         self.transport.write(resp.encode())
 
-    
+    def save(input):
+        try:
+            pass
+        except Exception:
+            return 'error\nwrong command\n\n' 
 
 
 #loop = asyncio.get_event_loop() #moved to run_server func
