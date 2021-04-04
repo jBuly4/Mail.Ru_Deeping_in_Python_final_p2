@@ -1,7 +1,8 @@
-import socket
 import asyncio
+from Collections import namedtuple
 
-requests = ['put', 'get', '*\n']
+requests = namedtuple('requests', 'put get all') # all = '*\n'
+request = requests(put = 'put', get = 'get', all = '*\n')
 
 def run_server(host, port):
     return
