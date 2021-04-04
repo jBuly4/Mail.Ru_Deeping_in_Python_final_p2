@@ -5,6 +5,19 @@ requests = namedtuple('requests', 'put get all') # all = '*\n'
 request = requests(put = 'put', get = 'get', all = '*\n')
 
 def run_server(host, port):
+    server_loop = asyncio.get_event_loop()
+    server_obj = server_loop.create_server(ClientServer, host, port) #creates a TCP server and returns server object. Server objects are asynchronous context managers
+
+    server = server_loop.run_until_complete(server_obj) # loop.run_until_complete(future) - Run until the future (an instance of Future) has completed.
+    try:
+        server_loop.run_forever()
+    except KeyboardInterrupt:
+        pass
+
+    server.close()
+    server_loop.run_until_complete(server.wait_closed())
+    server_loop.close()
+
     return
 
 class ClientServer(asyncio.Protocol):
@@ -15,16 +28,18 @@ class ClientServer(asyncio.Protocol):
         resp = process_data(data.decode())
         self.transport.write(resp.encode())
 
+    
 
-loop = asyncio.get_event_loop()
-coro = loop.create_server(ClientServer, '127.0.0.1', 8181)
 
-server = loop.run_until_complete(coro)
+#loop = asyncio.get_event_loop() #moved to run_server func
+#coro = loop.create_server(ClientServer, '127.0.0.1', 8181)
 
-try:
-    loop.run_forever()
-except KeyboardInterrupt:
-    pass
+# server = loop.run_until_complete(coro)
+#
+# try:
+#     loop.run_forever()
+# except KeyboardInterrupt:
+#     pass
 
 server.close()
 loop.run_until_complete(server.wait_closed())
