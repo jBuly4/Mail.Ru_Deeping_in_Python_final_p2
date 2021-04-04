@@ -1,5 +1,6 @@
 import asyncio
 from Collections import namedtuple
+import bisect
 
 requests = namedtuple('requests', 'put get all') # all = '*\n'
 request = requests(put = 'put', get = 'get', all = '*\n')
@@ -31,10 +32,26 @@ class ClientServer(asyncio.Protocol):
         self.transport.write(resp.encode())
 
     def save(input):
+        output = ''
         try:
-            pass
+            raw = input.split(' ')
+            if raw[0] == request.get:
+                if raw[1] == request.all:
+                    for key in data_recieved:
+                        for value in data_recieved[key]:
+                            output += str(key) + ' ' + str(value[0]) + ' ' + str(value[1])
+                    return 'ok\n' + output + '\n\n'
+                if raw[1] in data_recieved:
+                    for value in data_recieved[raw[1]]:
+                        output += str(raw[1]) + ' ' + str(value[0]) + ' ' + str(value[1])
+                    return 'ok\n' + output + '\n\n'
+                else:
+                    return 'ok\n' + output + '\n\n'
+            elif raw[0] == request.put:
+                
+
         except Exception:
-            return 'error\nwrong command\n\n' 
+            return 'error\nwrong command\n\n'
 
 
 #loop = asyncio.get_event_loop() #moved to run_server func
