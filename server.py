@@ -48,8 +48,15 @@ class ClientServer(asyncio.Protocol):
                 else:
                     return 'ok\n' + output + '\n\n'
             elif raw[0] == request.put:
-                
-
+                try:
+                    if raw[1] not in data_recieved:
+                        data_recieved[raw[1]] = []
+                    bisect.insort(data[raw[1]], (raw[2], raw[3]))
+                    return 'ok\n\n'
+                except Exception:
+                    return 'error\nwrong command\n\n' 
+            else:
+                return 'error\nwrong command\n\n'
         except Exception:
             return 'error\nwrong command\n\n'
 
