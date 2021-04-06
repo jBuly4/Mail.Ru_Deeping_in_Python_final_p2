@@ -4,7 +4,10 @@ from collections import namedtuple
 requests = namedtuple('requests', 'put get all') # all = '*\n'
 request = requests(put = 'put', get = 'get', all = '*\n')
 
+# print(request.put)
+
 def run_server(host, port):
+    # print(host, port)
     server_loop = asyncio.get_event_loop()
     server_obj = server_loop.create_server(ClientServer, host, port) #creates a TCP server and returns server object. Server objects are asynchronous context managers
 
@@ -21,45 +24,49 @@ def run_server(host, port):
     return
 
 class ClientServer(asyncio.Protocol):
-    data_recieved = {}
+    data_to_save = {}
 
     def __init__(self):
         self.transport = None
 
     def connection_made(self, transport):
+        print('start connection')
         self.transport = transport
+        print('connection made')
+        print(self.transport)
 
     def data_recieved(self, data):
-        resp = ClientServer.save(data.decode())
+        print('data recieved: {}'.format(data.decode()))
+        resp = self.save(data.decode())
         self.transport.write(resp.encode())
 
-    @staticmethod
-    def save(input):
+    # @staticmethod
+    def save(self, input):
         output = ''
-        # print(input)
+        print(input.decode())
         try:
             # print(input)
             raw = input.split(' ')
             if raw[0] == request.get:
                 if raw[1] == request.all:
-                    if ClientServer.data_recieved:
-                        for key in ClientServer.data_recieved:
-                            for value in ClientServer.data_recieved[key]:
+                    if self.data_to_save:
+                        for key in self.data_to_save:
+                            for value in self.data_to_save[key]:
                                 output += str(key) + ' ' + str(value[0]) + ' ' + str(value[1]) +  '\n'
-                        return 'ok\n' + output + '\n\n'
+                        return 'ok\n' + output + '\n'
                     else:
                         return 'ok\n\n'
-                if raw[1] in ClientServer.data_recieved:
-                    for value in ClientServer.data_recieved[raw[1]]:
+                if raw[1] in self.data_to_save:
+                    for value in self.data_to_save[raw[1]]:
                         output += str(raw[1]) + ' ' + str(value[0]) + ' ' + str(value[1]) + '\n'
-                    return 'ok\n' + output + '\n\n'
+                    return 'ok\n' + output + '\n'
                 else:
                     return 'ok\n\n'
             elif raw[0] == request.put:
                 try:
-                    if raw[1] not in ClientServer.data_recieved:
-                        ClientServer.data_recieved[raw[1]] = []
-                    ClientServer.data_recieved[raw[1]].append((raw[2], raw[3]))
+                    if raw[1] not in self.data_to_save:
+                        self.data_to_save[raw[1]] = []
+                    self.data_to_save[raw[1]].append((raw[2], raw[3]))
                     return 'ok\n\n'
                 except Exception:
                     return 'error\nwrong command\n\n'
