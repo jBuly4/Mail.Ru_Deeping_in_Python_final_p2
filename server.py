@@ -24,7 +24,7 @@ def run_server(host, port):
 
 class Storage:
     data_to_save = {}
-    print('data to save - ', data_to_save)
+
     def return_all(self):
         output = ''
 
@@ -32,24 +32,19 @@ class Storage:
             for key in self.data_to_save:
                 for value in self.data_to_save[key]:
                     output += f'{key} {value[0]} {value[1]}\n'
-
             return 'ok\n' + output + '\n'
 
         else:
-            
             return 'ok\n\n'
 
     def return_part(self, key):
-        print(f'return_part input key is {key}')
         output = ''
-        print(f'key in data_to_save is {key in self.data_to_save}')
-        print(key in self.data_to_save)
+
         if key in self.data_to_save:
             for value in self.data_to_save[key]:
                 output += f'{key} {value[0]} {value[1]}\n'
             return 'ok\n' + output + '\n'
         else:
-            print(f'returned answer for {key} is only ok')
             return 'ok\n\n'
 
     def put_in(self, raw):
@@ -58,16 +53,19 @@ class Storage:
             if key not in self.data_to_save:
                 self.data_to_save[key] = []
 
-            self.data_to_save[key] = list(filter(lambda saved_values: saved_values[1] != int(timestamp), self.data_to_save[key]))
+            self.data_to_save[key] = list(filter(lambda saved_values: saved_values[1] != int(timestamp), self.data_to_save[key])) #filtering timestamps
+
             self.data_to_save[key].append((float(value), int(timestamp)))
+
             return 'ok\n\n'
+
         except Exception:
+
             return 'error\nwrong command\n\n'
 
 storage = Storage()
 
 class ClientServer(asyncio.Protocol):
-    # storage = Storage()
 
     def connection_made(self, transport):
         self.transport = transport
@@ -77,49 +75,36 @@ class ClientServer(asyncio.Protocol):
         resp = self.save(data.decode())
         self.transport.write(resp.encode())
 
-    # @staticmethod
     def save(self, input):
-        print('***\ninput in save {}'.format(input))
         try:
             query, input = input.split(' ', maxsplit=1)
-            print(f'-->query {query}')
-            print(query == request.get)
-            print(f'-->input {input}')
-            print(f'-->len of input.split is {len(input.split())}')
-            print(f'-->query == request.get and len(input.split() == 1) is {(query == request.get and len(input.split()) == 1)}')
-            # print(query not in request)
+
             if query not in request:
                 return 'error\nwrong command\n\n'
 
             elif query == request.get and len(input.split()) == 1:
-                print(f'***\ngoing to getting')
                 return self.getting(input)
 
             elif query == request.put and len(input.split()) == 3:
-                print(f'***\ngoing to putting')
                 return self.putting(input)
 
             else:
-                print('returned error from save 1')
                 return 'error\nwrong command\n\n'
+
         except Exception:
-            print('returned error from save 2')
             return 'error\nwrong command\n\n'
 
     def getting(self, input):
         try:
-            print(f'***\ngetting input is {input}')
             key = input.strip('\n')
 
             if key == request.all:
-                print(f'going to return_all')
                 return storage.return_all()
+
             else:
-                print(f'going to return_part')
                 return storage.return_part(key)
 
         except Exception:
-            print('returned error from getting')
             return 'error\nwrong command\n\n'
 
     def putting(self, input):
@@ -129,4 +114,4 @@ class ClientServer(asyncio.Protocol):
         return storage.put_in(raw)
 
 
-run_server('127.0.0.1', 8888)
+# run_server('127.0.0.1', 8888)
