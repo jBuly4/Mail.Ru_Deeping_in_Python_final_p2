@@ -4,8 +4,6 @@ from collections import namedtuple
 requests = namedtuple('requests', 'put get all') # all = '*\n'
 request = requests(put = 'put', get = 'get', all = '*')
 
-print(f'request {request}')
-print(f'request.get is {request.get}')
 
 def run_server(host, port):
     server_loop = asyncio.get_event_loop()
